@@ -1,31 +1,32 @@
-import socket
+from Socket import Socket
 from threading import Thread
 
-client = socket.socket(
 
-    socket.AF_INET,
-    socket.SOCK_STREAM,
+class Client(Socket):
+    def __init__(self):
+        super(Client, self).__init__()
 
-)
+    def set_up(self):
+        self.connect(
+            ("127.0.0.1", 1234)
+        )
 
-client.connect(
-    ("127.0.0.1", 1234)
-)
+        listen_thread = Thread(target=self.listen_socket)
+        listen_thread.start()
 
+        send_thread = Thread(target=self.send_data, args=(None,))
+        send_thread.start()
 
-def listen_server():
-    while True:
-        data = client.recv(2048)  # receive
-        print(data.decode("utf-8"))
+    def listen_socket(self, listened_socket=None):
+        while True:
+            data = self.recv(2048)  # receive
+            print(data.decode("utf-8"))
 
-
-def send_server():
-    listen_thread = Thread(target=listen_server)
-    listen_thread.start()
-
-    while True:
-        client.send(input(":::").encode("utf-8"))
+    def send_data(self, data):
+        while True:
+            self.send(input(":::").encode("utf-8"))
 
 
 if __name__ == '__main__':
-    send_server()
+    client = Client()
+    client.set_up()
