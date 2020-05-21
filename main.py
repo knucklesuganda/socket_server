@@ -2,6 +2,7 @@ from Socket import Socket
 import asyncio
 
 
+
 class Server(Socket):
     def __init__(self):
         super(Server, self).__init__()
@@ -24,10 +25,14 @@ class Server(Socket):
             return
 
         while True:
-            data = self.main_loop.sock_recv(listened_socket, 2048)
-            print(f"User sent {data}")
+            try:
+                data = await self.main_loop.sock_recv(listened_socket, 2048)
+                await self.send_data(data)
 
-            await self.send_data(data)
+            except ConnectionResetError:
+                print("Client removed")
+                self.users.remove(listened_socket)
+                return
 
     async def accept_sockets(self):
         while True:
