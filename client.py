@@ -2,6 +2,7 @@ from Socket import Socket
 from datetime import datetime
 
 from os import system
+from Encryption import Encryptor
 import asyncio
 
 
@@ -9,6 +10,7 @@ class Client(Socket):
     def __init__(self):
         super(Client, self).__init__()
         self.messages = ""
+        self.encryptor = Encryptor()
 
     def set_up(self):
         try:
@@ -24,7 +26,9 @@ class Client(Socket):
     async def listen_socket(self, listened_socket=None):
         while True:
             data = await self.main_loop.sock_recv(self.socket, 2048)
-            self.messages += f"{datetime.now().date()}: {data.decode('utf-8')}\n"
+            clean_data = self.encryptor.decrypt(data.decode("utf-8"))
+            
+            self.messages += f"{datetime.now().date()}: {clean_data}\n"
 
             system("cls")
             print(self.messages)
@@ -32,7 +36,9 @@ class Client(Socket):
     async def send_data(self, data=None):
         while True:
             data = await self.main_loop.run_in_executor(None, input)
-            await self.main_loop.sock_sendall(self.socket, data.encode("utf-8"))
+            encrypted_data = self.encryptor.encrypt(data)
+
+            await self.main_loop.sock_sendall(self.socket, encrypted_data.encode("utf-8"))
 
     async def main(self):
         await asyncio.gather(

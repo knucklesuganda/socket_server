@@ -2,7 +2,6 @@ from Socket import Socket
 import asyncio
 
 
-
 class Server(Socket):
     def __init__(self):
         super(Server, self).__init__()
@@ -27,6 +26,7 @@ class Server(Socket):
         while True:
             try:
                 data = await self.main_loop.sock_recv(listened_socket, 2048)
+                print(data.decode("utf-8"))
                 await self.send_data(data)
 
             except ConnectionResetError:
