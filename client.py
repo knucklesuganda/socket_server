@@ -1,56 +1,31 @@
-from Socket import Socket
-from datetime import datetime
-
-from os import system
-from Encryption import Encryptor
-import asyncio
+from twisted.internet import reactor, protocol
+from twisted.internet.protocol import ClientFactory as ClFactory
+from twisted.internet.endpoints import TCP4ClientEndpoint
 
 
-class Client(Socket):
+class Client(protocol.Protocol):
     def __init__(self):
-        super(Client, self).__init__()
-        self.messages = ""
-        self.encryptor = Encryptor()
+        print("Created")
+        reactor.callInThread(self.message_input)
 
-    def set_up(self):
-        try:
-            self.socket.connect(
-                ("127.0.0.1", 1234)
-            )
-        except ConnectionRefusedError:
-            print("Sorry, server is offline")
-            exit(0)
+    def send_message(self, data: str):
+        self.transport.write(data.encode("utf-8"))
 
-        self.socket.setblocking(False)
-
-    async def listen_socket(self, listened_socket=None):
+    def message_input(self):
         while True:
-            data = await self.main_loop.sock_recv(self.socket, 2048)
-            clean_data = self.encryptor.decrypt(data.decode("utf-8"))
-            
-            self.messages += f"{datetime.now().date()}: {clean_data}\n"
+            self.send_message(input())
 
-            system("cls")
-            print(self.messages)
+    def dataReceived(self, data):
+        data = data.decode("utf-8")
+        print(data)
 
-    async def send_data(self, data=None):
-        while True:
-            data = await self.main_loop.run_in_executor(None, input)
-            encrypted_data = self.encryptor.encrypt(data)
 
-            await self.main_loop.sock_sendall(self.socket, encrypted_data.encode("utf-8"))
-
-    async def main(self):
-        await asyncio.gather(
-
-            self.main_loop.create_task(self.listen_socket()),
-            self.main_loop.create_task(self.send_data())
-
-        )
+class ClientFactory(ClFactory):
+    def buildProtocol(self, addr):
+        return Client()
 
 
 if __name__ == '__main__':
-    client = Client()
-    client.set_up()
-
-    client.start()
+    endpoint = TCP4ClientEndpoint(reactor, 'localhost', 12345)
+    endpoint.connect(ClientFactory())
+    reactor.run()
