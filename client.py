@@ -1,5 +1,5 @@
 from twisted.internet import reactor, protocol
-from twisted.internet.protocol import ClientFactory as ClFactory
+from twisted.internet.protocol import ReconnectingClientFactory as ClFactory
 from twisted.internet.endpoints import TCP4ClientEndpoint
 
 
@@ -21,6 +21,13 @@ class Client(protocol.Protocol):
 
 
 class ClientFactory(ClFactory):
+    def clientConnectionLost(self, connector, unused_reason):
+        self.retry(connector)
+
+    def clientConnectionFailed(self, connector, reason):
+        print(reason)
+        self.retry(connector)
+
     def buildProtocol(self, addr):
         return Client()
 

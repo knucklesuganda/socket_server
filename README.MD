@@ -1,1 +1,1 @@
-Simple socket server on Python3. 
+Python 3 Messenger
