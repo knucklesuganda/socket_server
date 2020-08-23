@@ -1,6 +1,9 @@
 from twisted.internet import reactor, protocol
 from twisted.internet.protocol import ServerFactory as ServFactory, connectionDone
 from twisted.internet.endpoints import TCP4ServerEndpoint
+import json
+
+# value, type
 
 
 class Server(protocol.Protocol):
@@ -12,36 +15,55 @@ class Server(protocol.Protocol):
     def connectionMade(self):
         self.clients[self.my_id] = self
 
-    def send_message(self, data: str, where=None):
-        if where:
-            where.transport.write(data.encode("utf-8"))
+    @staticmethod
+    def __encode_json(**kwargs):
+        return json.dumps(kwargs)
+
+    def send_message(self, **kwargs):
+        if kwargs.get('where'):
+            where = kwargs['where']
+            del kwargs['where']
+            where.transport.write(self.__encode_json(**kwargs).encode("utf-8"))
         else:
-            self.transport.write(data.encode("utf-8"))
+            self.transport.write(self.__encode_json(**kwargs).encode("utf-8"))
 
     def dataReceived(self, data):
-        data = data.decode("utf-8")
+        try:
+            data = json.loads(data.decode("utf-8"))
+        except UnicodeDecodeError:
+            self.send_message(value="Cannot decode, use utf-8", type='error')
+            return
+        except json.JSONDecodeError:
+            self.send_message(value="Cannot decode, use json", type='error')
+            return
 
-        if not self.another_client:
+        if not data.get('type') or not data.get('value'):
+            self.send_message(value=f"Wrong data", type='error')
+            return
+
+        if data['type'] == "user_choose":
             try:
-                another_client = int(data)
+                another_client = int(data['value'])
                 if another_client in self.clients.keys():
                     self.another_client = another_client
                 else:
                     raise KeyError
 
             except ValueError:
-                self.send_message("Write another id as int")
+                self.send_message(value="Write another id as int", type='error')
             except KeyError:
-                self.send_message("Can't find that client")
-
+                self.send_message(value="Can't find that client", type='error')
             else:
-                self.send_message(f"Talk to {self.another_client}")
+                self.send_message(value=f"Talk to {self.another_client}", type='user_chosen')
 
-        else:
+        elif data['type'] == "new_message":
+            if not self.another_client:
+                self.send_message(value=f"Don't have a client to send your message to", type='error')
+
             try:
-                self.send_message(data, self.clients[self.another_client])
+                self.send_message(value=data['value'], where=self.clients[self.another_client], type='new_message')
             except KeyError:
-                self.send_message("something wrong happened, try another client")
+                self.send_message(value="Something wrong happened, try another client", type='error')
                 self.another_client = None
 
     def connectionLost(self, reason=connectionDone):
