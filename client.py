@@ -24,7 +24,7 @@ class Client(protocol.Protocol):
     def dataReceived(self, data):
         try:
             data = json.loads(data.decode("utf-8"))
-        except UnicodeDecodeError and json.JSONDecodeError:
+        except UnicodeDecodeError or json.JSONDecodeError:
             print("Something went wrong :(", file=stderr)
             return
 
