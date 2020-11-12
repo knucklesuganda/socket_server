@@ -1,0 +1,69 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DjangoUnresolvedUrlInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="118" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="HtmlFormInputWithoutLabel" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="LongLine" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ProblematicWhitespace" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ProjectFingerprint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="4">
+            <item index="0" class="java.lang.String" itemvalue="telebot" />
+            <item index="1" class="java.lang.String" itemvalue="logging" />
+            <item index="2" class="java.lang.String" itemvalue="colorit" />
+            <item index="3" class="java.lang.String" itemvalue="pillow" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E402" />
+          <option value="E127" />
+          <option value="E122" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyShadowingNamesInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyStubPackagesAdvertiser" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="PyQt5-stubs==5.14.2.2" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="twisted.internet.reactor.run" />
+          <option value="program_design.Ui_Form.send_button" />
+          <option value="program_design.Ui_Form.messages" />
+          <option value="program_design.Ui_Form.message_input" />
+          <option value="client.main_ui.widgets" />
+          <option value="set.__getitem__" />
+          <option value="set.__delitem__" />
+          <option value="server.server.game" />
+          <option value="server.server.database" />
+          <option value="tuple.__delitem__" />
+          <option value="twisted.internet.reactor.callInThread" />
+          <option value="server.server.TwistedGame" />
+          <option value="client.ClFactory" />
+          <option value="vk_api.exceptions.VkApiError.code" />
+          <option value="client.ClientFactory" />
+          <option value="twisted.internet.reactor.connectTCP" />
+          <option value="client.app.*" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SSBasedInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="TsLint" enabled="true" level="WARNING" enabled_by_default="true" />
+  </profile>
+</component>

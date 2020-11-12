@@ -6,6 +6,13 @@ from Encryption import Encryptor
 import asyncio
 
 
+# ORM(SqlAlchemy, Django-ORM, peewee)
+# Framework(Twisted, asyncio.Protocols)
+# DB(MySQL, PSSQL, sqlite)
+# UI(Kivy, PYQt, Tkinter)
+# tests
+
+
 class Client(Socket):
     def __init__(self):
         super(Client, self).__init__()
@@ -35,7 +42,7 @@ class Client(Socket):
 
     async def send_data(self, data=None):
         while True:
-            data = await self.main_loop.run_in_executor(None, input)
+            data = await self.main_loop.run_in_executor(None, input, ":::")
             encrypted_data = self.encryptor.encrypt(data)
 
             await self.main_loop.sock_sendall(self.socket, encrypted_data.encode("utf-8"))
