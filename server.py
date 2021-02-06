@@ -1,6 +1,8 @@
 from Socket import Socket
 import asyncio
 
+from exceptions import SocketException
+
 
 class Server(Socket):
     def __init__(self):
@@ -14,24 +16,22 @@ class Server(Socket):
         self.socket.setblocking(False)
         print("Server is listening")
 
-    async def send_data(self, data=None):
+    async def send_data(self, **kwargs):
         for user in self.users:
-            await self.main_loop.sock_sendall(user, data)
+            try:
+                await super(Server, self).send_data(where=user, message=kwargs['message'])
+            except SocketException as exc:
+                print(exc)
+                user.close()
 
     async def listen_socket(self, listened_socket=None):
-        if not listened_socket:
-            return
-
         while True:
             try:
-                data = await self.main_loop.sock_recv(listened_socket, 4096)
-                print(data)
-                await self.send_data(data)
-
-            except ConnectionResetError:
-                print("Client removed")
-                self.users.remove(listened_socket)
-                return
+                data = await super(Server, self).listen_socket(listened_socket)
+                await self.send_data(message=data['message'])
+            except SocketException as exc:
+                print(exc)
+                listened_socket.close()
 
     async def accept_sockets(self):
         while True:

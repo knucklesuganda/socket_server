@@ -1,0 +1,4 @@
+
+
+class SocketException(Exception):
+    pass

@@ -5,12 +5,7 @@ from os import system
 from Encryption import Encryptor
 import asyncio
 
-
-# ORM(SqlAlchemy, Django-ORM, peewee)
-# Framework(Twisted, asyncio.Protocols)
-# DB(MySQL, PSSQL, sqlite)
-# UI(Kivy, PYQt, Tkinter)
-# tests
+from exceptions import SocketException
 
 
 class Client(Socket):
@@ -30,13 +25,16 @@ class Client(Socket):
 
         self.socket.setblocking(False)
 
-    async def listen_socket(self, listened_socket=None):
+    async def listen_socket(self, listened_socket):
         while True:
-            data = await self.main_loop.sock_recv(self.socket, 2048)
-            clean_data = self.encryptor.decrypt(data.decode("utf-8"))
-            
-            self.messages += f"{datetime.now().date()}: {clean_data}\n"
+            try:
+                data = await super(Client, self).listen_socket(listened_socket)
+            except SocketException as exc:
+                print(exc)
+                continue
 
+            decrypted_data = self.encryptor.decrypt(data['message'])
+            self.messages += f"{datetime.now().date()}: {decrypted_data}\n"
             system("cls")
             print(self.messages)
 
@@ -45,12 +43,12 @@ class Client(Socket):
             data = await self.main_loop.run_in_executor(None, input, ":::")
             encrypted_data = self.encryptor.encrypt(data)
 
-            await self.main_loop.sock_sendall(self.socket, encrypted_data.encode("utf-8"))
+            await super(Client, self).send_data(where=self.socket, message=encrypted_data)
 
     async def main(self):
         await asyncio.gather(
 
-            self.main_loop.create_task(self.listen_socket()),
+            self.main_loop.create_task(self.listen_socket(self.socket)),
             self.main_loop.create_task(self.send_data())
 
         )
