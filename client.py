@@ -1,7 +1,9 @@
+import settings
 from Socket import Socket
 from datetime import datetime
 
 from os import system
+from sys import platform
 from Encryption import Encryptor
 import asyncio
 
@@ -16,9 +18,7 @@ class Client(Socket):
 
     def set_up(self):
         try:
-            self.socket.connect(
-                ("127.0.0.1", 1234)
-            )
+            self.socket.connect(settings.SERVER_ADDRESS)
         except ConnectionRefusedError:
             print("Sorry, server is offline")
             exit(0)
@@ -27,25 +27,37 @@ class Client(Socket):
 
     async def listen_socket(self, listened_socket):
         while True:
+            if not self.is_working:
+                return
+
             try:
                 data = await super(Client, self).listen_socket(listened_socket)
             except SocketException as exc:
                 print(exc)
-                continue
+                self.is_working = False
+                break
 
             decrypted_data = self.encryptor.decrypt(data['message'])
             self.messages += f"{datetime.now().date()}: {decrypted_data}\n"
-            system("cls")
+
+            if platform == 'win32':
+                system("cls")
+            else:
+                system("clear")
+
             print(self.messages)
 
     async def send_data(self, data=None):
         while True:
             data = await self.main_loop.run_in_executor(None, input, ":::")
-            encrypted_data = self.encryptor.encrypt(data)
+            if not self.is_working:
+                return
 
+            encrypted_data = self.encryptor.encrypt(data)
             await super(Client, self).send_data(where=self.socket, message=encrypted_data)
 
     async def main(self):
+
         await asyncio.gather(
 
             self.main_loop.create_task(self.listen_socket(self.socket)),

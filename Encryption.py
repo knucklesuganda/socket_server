@@ -1,16 +1,12 @@
-# Алгоритм
-# Передача ключа
+import settings
 
 
 class Encryptor:
-    def __init__(self):
-        self.key = 20
-
     def encrypt(self, text):
         encrypted_text = ""
 
         for symb in text:
-            encrypted_text += chr(ord(symb) + self.key)
+            encrypted_text += chr(ord(symb) + settings.ENCRYPTION_KEY)
 
         return encrypted_text
 
@@ -18,7 +14,7 @@ class Encryptor:
         decrypted_text = ""
 
         for symb in text:
-            decrypted_text += chr(ord(symb) - self.key)
+            decrypted_text += chr(ord(symb) - settings.ENCRYPTION_KEY)
 
         return decrypted_text
 

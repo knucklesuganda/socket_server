@@ -3,6 +3,7 @@ import asyncio
 import struct
 import json
 
+import settings
 from exceptions import SocketException
 
 
@@ -12,6 +13,7 @@ class Socket:
             socket.AF_INET,
             socket.SOCK_STREAM,
         )
+        self.is_working = False
 
         self.main_loop = asyncio.new_event_loop()
 
@@ -40,10 +42,10 @@ class Socket:
         return message
 
     def _encode_data(self, data):
-        return json.dumps(data).encode('utf-8')
+        return json.dumps(data).encode(settings.ENCODING)
 
     def _decode_data(self, data: bytes):
-        return json.loads(data.decode("utf-8"))
+        return json.loads(data.decode(settings.ENCODING))
 
     async def listen_socket(self, listened_socket):
         try:
@@ -59,6 +61,7 @@ class Socket:
         raise NotImplementedError()
 
     def start(self):
+        self.is_working = True
         self.main_loop.run_until_complete(self.main())
 
     def set_up(self):

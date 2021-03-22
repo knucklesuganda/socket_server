@@ -1,6 +1,5 @@
+import settings
 from Socket import Socket
-import asyncio
-
 from exceptions import SocketException
 
 
@@ -10,7 +9,7 @@ class Server(Socket):
         self.users = []
 
     def set_up(self):
-        self.socket.bind(("127.0.0.1", 1234))
+        self.socket.bind(settings.SERVER_ADDRESS)
 
         self.socket.listen(5)
         self.socket.setblocking(False)
