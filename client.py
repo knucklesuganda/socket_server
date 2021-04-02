@@ -1,5 +1,6 @@
 import settings
 from Socket import Socket
+import json
 from datetime import datetime
 
 from os import system
@@ -37,8 +38,8 @@ class Client(Socket):
                 self.is_working = False
                 break
 
-            decrypted_data = self.encryptor.decrypt(data['message'])
-            self.messages += f"{datetime.now().date()}: {decrypted_data}\n"
+            decrypted_data = json.loads(self.encryptor.decrypt(data['data']))
+            self.messages += f"{decrypted_data['message_time']}: {decrypted_data['message_text']}\n"
 
             if platform == 'win32':
                 system("cls")
@@ -49,12 +50,20 @@ class Client(Socket):
 
     async def send_data(self, data=None):
         while True:
-            data = await self.main_loop.run_in_executor(None, input, ":::")
+            message = await self.main_loop.run_in_executor(None, input, ":::")
             if not self.is_working:
                 return
 
-            encrypted_data = self.encryptor.encrypt(data)
-            await super(Client, self).send_data(where=self.socket, message=encrypted_data)
+            current_time = datetime.now()
+
+            encrypted_data = self.encryptor.encrypt(json.dumps(
+                {
+                    "message_text": message,
+                    "message_time": f"{current_time.hour}:{current_time.minute}:{current_time.second}"
+                }
+            ))
+
+            await super(Client, self).send_data(where=self.socket, data=encrypted_data)
 
     async def main(self):
 

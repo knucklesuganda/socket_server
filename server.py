@@ -18,7 +18,7 @@ class Server(Socket):
     async def send_data(self, **kwargs):
         for user in self.users:
             try:
-                await super(Server, self).send_data(where=user, message=kwargs['message'])
+                await super(Server, self).send_data(where=user, data=kwargs['data'])
             except SocketException as exc:
                 print(exc)
                 user.close()
@@ -27,7 +27,7 @@ class Server(Socket):
         while True:
             try:
                 data = await super(Server, self).listen_socket(listened_socket)
-                await self.send_data(message=data['message'])
+                await self.send_data(data=data['data'])
             except SocketException as exc:
                 print(exc)
                 listened_socket.close()
